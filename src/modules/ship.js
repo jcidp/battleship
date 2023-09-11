@@ -2,11 +2,11 @@ class Ship {
   constructor(length) {
     this.length = length;
     this.hits = 0;
-    this.sunk = false;
   }
 
   hit() {
-    if (this.hits < this.length) return this.hits++;
+    if (this.hits < this.length) this.hits++;
+    return this.hits;
   }
 
   isSunk() {
