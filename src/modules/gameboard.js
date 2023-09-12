@@ -2,64 +2,51 @@ import Ship from "./ship";
 
 class Gameboard {
   constructor() {
-    this.board = this.fillBoard();
+    this.board = Array(10).fill(Array(10).fill(null));
   }
 
-  fillBoard() {
-    const board = [];
-    for (let i = 0; i < 10; i++) {
-      const obj = {};
-      for (let j = 0; j < 10; j++) {
-        obj[String.fromCharCode(65 + j)] = null;
-      }
-      board.push(obj);
+  placeShip(start, end) {
+    const [startCol, startRow] =
+      this.constructor.getIndexesFromCoordinates(start);
+    if (!end) {
+      this.board[startRow][startCol] = new Ship(1);
+      return;
     }
-    return board;
-  }
-
-  placeShip(startCol, startRow, endCol, endRow) {
-    const rowDistance = !endRow ? 1 : endRow - startRow + 1;
-    const colDistance = !endCol
-      ? 1
-      : endCol.charCodeAt(0) - startCol.charCodeAt(0) + 1;
-    const direction = rowDistance === 1 ? "column" : "row";
-    const distance = direction === "row" ? rowDistance : colDistance;
+    const [endCol, endRow] = this.constructor.getIndexesFromCoordinates(end);
+    const distance =
+      startRow === endRow ? endCol - startCol + 1 : endRow - startRow + 1;
     const ship = new Ship(distance);
-    if (direction === "row") {
-      for (let i = 0; i < distance; i++) {
-        this.board[startRow - 1 + i][startCol] = ship;
-      }
-    } else {
-      for (let i = 0; i < distance; i++) {
-        this.board[startRow - 1][
-          String.fromCharCode(startCol.charCodeAt(0) + i)
-        ] = ship;
-      }
+    for (let i = 0; i < distance; i++) {
+      if (startRow === endRow) this.board[startRow][startCol + i] = ship;
+      else this.board[startRow + i][startCol] = ship;
     }
   }
 
-  getCoordinates(col, row) {
-    return this.board[row - 1][col];
+  static getIndexesFromCoordinates(coordinates) {
+    return [coordinates.charCodeAt(0) - 65, +coordinates[1] - 1];
   }
 
-  receiveAttack(col, row) {
-    const ship = this.getCoordinates(col, row);
+  getCoordinates(coordinates) {
+    const [col, row] = this.constructor.getIndexesFromCoordinates(coordinates);
+    return this.board[row][col];
+  }
+
+  receiveAttack(coordinates) {
+    // TODO: How will I ensure I don't attack the same ship in the same coordinates twice?
+    const ship = this.getCoordinates(coordinates);
     if (ship) {
       ship.hit();
     } else {
-      this.board[row - 1][col] = "miss";
+      const [col, row] =
+        this.constructor.getIndexesFromCoordinates(coordinates);
+      this.board[row][col] = "miss";
     }
   }
 
   haveAllShipsSunk() {
-    return this.board
-      .map((row) =>
-        Object.keys(row)
-          .map((cell) => row[cell])
-          .filter((cell) => cell !== null && cell !== "miss")
-          .every((ship) => ship.isSunk()),
-      )
-      .every((row) => row);
+    return this.board.every((row) =>
+      row.every((cell) => cell === null || cell === "miss" || cell.isSunk()),
+    );
   }
 }
 
