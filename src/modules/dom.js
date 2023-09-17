@@ -29,7 +29,7 @@ function renderPageLayout() {
 }
 
 function getCoordinatesFromIndexes(row, col) {
-  return `${String.fromCharCode(row + 65)}${col + 1}`;
+  return `${String.fromCharCode(col + 65)}${row + 1}`;
 }
 
 function renderBoard(board, player) {

@@ -17,7 +17,7 @@ test("Attacking the enemy removes coordinates from available shots", () => {
   const player = new Player();
   const enemy = new Player();
   expect(player.shotsAvailable.includes(20)).toBe(true);
-  player.attack(enemy, "B10");
+  player.attack(enemy, "J2");
   expect(player.shotsAvailable.includes(20)).toBe(false);
   expect(player.shotsAvailable.includes(78)).toBe(true);
   player.attack(enemy, "H8");

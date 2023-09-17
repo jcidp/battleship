@@ -8,14 +8,11 @@ const gameController = (() => {
   const getComputer = () => computer;
 
   const createPlayerShips = (player) => {
-    player.board.placeShip("B6", "B10");
-    player.board.placeShip("D1", "D4");
-    player.board.placeShip("F4", "F6");
-    player.board.placeShip("H2", "H3");
-    player.board.placeShip("H8", "H9");
-    player.board.placeShip("J3");
-    player.board.placeShip("J8");
-    console.log(player.getBoard());
+    player.board.placeShip("F2", "J2");
+    player.board.placeShip("A4", "D4");
+    player.board.placeShip("D6", "F6");
+    player.board.placeShip("I4", "I6");
+    player.board.placeShip("F9", "G9");
   };
 
   const setupGame = () => {

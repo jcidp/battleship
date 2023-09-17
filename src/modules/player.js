@@ -8,19 +8,19 @@ class Player {
   }
 
   attack(enemy, coordinates) {
-    const shotIndex = this.constructor.getNumberFromCoordinates(coordinates);
-    if (!this.shotsAvailable.includes(shotIndex)) return;
+    const shotNumber = this.constructor.getNumberFromCoordinates(coordinates);
+    if (!this.shotsAvailable.includes(shotNumber)) return;
     enemy.board.receiveAttack(coordinates);
-    this.shotsAvailable = this.shotsAvailable.filter((n) => n !== shotIndex);
+    this.shotsAvailable = this.shotsAvailable.filter((n) => n !== shotNumber);
   }
 
   static getNumberFromCoordinates(coordinates) {
-    return (coordinates.charCodeAt(0) - 65) * 10 + +coordinates.slice(1);
+    return coordinates.charCodeAt(0) - 64 + +coordinates.slice(1) * 10 - 10;
   }
 
   static getCoordinatesFromNumber(n) {
-    return `${String.fromCharCode(Math.floor((n - 1) / 10) + 65)}${
-      n % 10 === 0 ? 10 : n % 10
+    return `${String.fromCharCode((n % 10 === 0 ? 10 : n % 10) + 64)}${
+      Math.floor(n / 10) + (n % 10 === 0 ? 0 : 1)
     }`;
   }
 
