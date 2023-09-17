@@ -1,4 +1,4 @@
 import "./style.scss";
+import { renderPageLayout } from "./modules/dom";
 
-const text = document.querySelector("body");
-text.textContent = "Hello, world!";
+renderPageLayout();

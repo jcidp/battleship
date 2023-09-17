@@ -1,5 +1,43 @@
-$body-color: purple;
+$primary-color: purple;
+$secondary-color: #555;
+$highlight-color: purple;
+$primary-fc: black;
+$secondary-fc: white;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
-  color: $body-color;
+  display: grid;
+  grid-template-rows: max-content 1fr max-content;
+  height: 100lvh;
+}
+
+header {
+  background-color: $secondary-color;
+  color: $secondary-fc;
+  text-align: center;
+  padding: 0.5em 0;
+}
+
+footer {
+  background-color: $secondary-color;
+  padding: 0.25em 0;
+
+  a {
+    color: $secondary-fc;
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  svg {
+    margin-left: 0.5em;
+    max-width: 1.5em;
+    fill: $secondary-fc;
+  }
 }
