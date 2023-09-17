@@ -15,6 +15,7 @@ const gameController = (() => {
     player.board.placeShip("H8", "H9");
     player.board.placeShip("J3");
     player.board.placeShip("J8");
+    console.log(player.getBoard());
   };
 
   const setupGame = () => {

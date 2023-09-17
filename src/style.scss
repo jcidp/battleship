@@ -1,4 +1,4 @@
-$primary-color: purple;
+$primary-color: steelblue;
 $secondary-color: #555;
 $highlight-color: purple;
 $primary-fc: black;
@@ -9,6 +9,8 @@ $secondary-fc: white;
   margin: 0;
   padding: 0;
 }
+
+// General layout
 
 body {
   display: grid;
@@ -39,5 +41,38 @@ footer {
     margin-left: 0.5em;
     max-width: 1.5em;
     fill: $secondary-fc;
+  }
+}
+
+// Game view
+
+section {
+  margin-top: 2em;
+
+  h2 {
+    font-size: 1.25rem;
+    text-align: center;
+  }
+}
+
+.board {
+  margin: 0 auto;
+  padding: 1em;
+  display: grid;
+  grid-template: repeat(11, minmax(30px, 1fr)) / repeat(11, minmax(30px, 1fr));
+  aspect-ratio: 1 / 1;
+  max-height: calc((100svh - 10em) / 2);
+
+  .label {
+    display: grid;
+    place-content: center;
+  }
+
+  .cell {
+    border: 1px solid $secondary-color;
+
+    &.ship {
+      background-color: $primary-color;
+    }
   }
 }

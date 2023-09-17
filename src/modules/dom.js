@@ -28,4 +28,53 @@ function renderPageLayout() {
   body.appendChild(footer);
 }
 
-export { renderPageLayout };
+function getCoordinatesFromIndexes(row, col) {
+  return `${String.fromCharCode(row + 65)}${col + 1}`;
+}
+
+function renderBoard(board, player) {
+  const boardContainer = createElement("div", null, `${player} board`);
+  for (let i = 0; i < 11; i++) {
+    const colLabel = createElement("div", null, "label col");
+    colLabel.appendChild(
+      createElement("span", i === 0 ? "" : String.fromCharCode(i + 64)),
+    );
+    boardContainer.appendChild(colLabel);
+  }
+  board.forEach((row, i) => {
+    const rowLabel = createElement("div", null, "label row");
+    rowLabel.appendChild(createElement("span", i + 1));
+    boardContainer.appendChild(rowLabel);
+    row.forEach((cell, j) => {
+      let classes = "cell";
+      if (cell.attacked) classes += " attacked";
+      if (cell.ship) classes += " ship";
+      const coordinates = getCoordinatesFromIndexes(i, j);
+      boardContainer.appendChild(
+        createElement("div", null, classes, [
+          ["data-coordinates", coordinates],
+        ]),
+      );
+    });
+  });
+  return boardContainer;
+}
+
+function renderInitialScreen() {
+  const playerBoard = gameController.getPlayer().getBoard();
+  const computerBoard = gameController.getComputer().getBoard();
+
+  const main = document.querySelector("main");
+
+  const playerSection = createElement("section");
+  playerSection.appendChild(createElement("h2", "Player's Board"));
+  playerSection.appendChild(renderBoard(playerBoard, "player"));
+  main.appendChild(playerSection);
+
+  const enemySection = createElement("section");
+  enemySection.appendChild(createElement("h2", "Computer's Board"));
+  enemySection.appendChild(renderBoard(computerBoard, "computer"));
+  main.appendChild(enemySection);
+}
+
+export { renderPageLayout, renderInitialScreen };

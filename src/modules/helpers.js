@@ -1,8 +1,9 @@
 const createElement = (element, content, classes, attributes) => {
   const ele = document.createElement(element);
   if (content) ele.textContent = content;
-  if (classes)
-    classes.split(" ").forEach((newClass) => ele.classList.add(newClass));
+  if (classes && classes.length) {
+    classes.split(" ").forEach((myClass) => ele.classList.add(myClass));
+  }
   if (attributes)
     attributes.forEach((attribute) =>
       ele.setAttribute(attribute[0], attribute[1]),

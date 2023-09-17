@@ -37,6 +37,10 @@ class Player {
   getName() {
     return this.name;
   }
+
+  getBoard() {
+    return this.board.board;
+  }
 }
 
 export default Player;
