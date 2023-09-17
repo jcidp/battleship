@@ -19,20 +19,22 @@ class Player {
   }
 
   static getCoordinatesFromNumber(n) {
-    return `${String.fromCharCode(Math.floor((n - 1) / 10) + 65)}${n % 10}`;
+    return `${String.fromCharCode(Math.floor((n - 1) / 10) + 65)}${
+      n % 10 === 0 ? 10 : n % 10
+    }`;
   }
 
   makeRandomAttack(enemy) {
     const coordinates = this.constructor.getCoordinatesFromNumber(
       this.shotsAvailable[
-        Math.floor(Math.random() * this.shotsAvailable.length) + 1
+        Math.floor(Math.random() * this.shotsAvailable.length)
       ],
     );
     this.attack(enemy, coordinates);
     return coordinates;
   }
 
-  getPlayerName() {
+  getName() {
     return this.name;
   }
 }
