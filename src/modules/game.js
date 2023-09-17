@@ -44,6 +44,7 @@ const gameController = (() => {
 
     if (enemy.board.haveAllShipsSunk()) {
       gameOver(getPlayer());
+      return;
     }
     computerTurn();
   };
