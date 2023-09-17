@@ -2,14 +2,27 @@ import Ship from "./ship";
 
 class Gameboard {
   constructor() {
-    this.board = Array(10).fill(Array(10).fill(null));
+    // this.board = Array(10).fill(Array(10).fill(null));
+    this.board = this.constructor.fillBoard();
+  }
+
+  static fillBoard() {
+    const board = [];
+    for (let i = 0; i < 10; i++) {
+      const row = [];
+      for (let j = 0; j < 10; j++) {
+        row.push({ attacked: false, ship: null });
+      }
+      board.push(row);
+    }
+    return board;
   }
 
   placeShip(start, end) {
     const [startCol, startRow] =
       this.constructor.getIndexesFromCoordinates(start);
     if (!end) {
-      this.board[startRow][startCol] = new Ship(1);
+      this.board[startRow][startCol].ship = new Ship(1);
       return;
     }
     const [endCol, endRow] = this.constructor.getIndexesFromCoordinates(end);
@@ -17,8 +30,8 @@ class Gameboard {
       startRow === endRow ? endCol - startCol + 1 : endRow - startRow + 1;
     const ship = new Ship(distance);
     for (let i = 0; i < distance; i++) {
-      if (startRow === endRow) this.board[startRow][startCol + i] = ship;
-      else this.board[startRow + i][startCol] = ship;
+      if (startRow === endRow) this.board[startRow][startCol + i].ship = ship;
+      else this.board[startRow + i][startCol].ship = ship;
     }
   }
 
@@ -32,20 +45,18 @@ class Gameboard {
   }
 
   receiveAttack(coordinates) {
-    // TODO: How will I ensure I don't attack the same ship in the same coordinates twice?
-    const ship = this.getCoordinates(coordinates);
-    if (ship) {
-      ship.hit();
-    } else {
-      const [col, row] =
-        this.constructor.getIndexesFromCoordinates(coordinates);
-      this.board[row][col] = "miss";
+    const cell = this.getCoordinates(coordinates);
+    if (cell.attacked) throw new Error("Repeated coordinates");
+    if (cell.ship) {
+      cell.ship.hit();
     }
+    const [col, row] = this.constructor.getIndexesFromCoordinates(coordinates);
+    this.board[row][col].attacked = true;
   }
 
   haveAllShipsSunk() {
     return this.board.every((row) =>
-      row.every((cell) => cell === null || cell === "miss" || cell.isSunk()),
+      row.every((cell) => !cell.ship || cell.ship.isSunk()),
     );
   }
 }
