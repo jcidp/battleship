@@ -1,6 +1,6 @@
 $primary-color: steelblue;
 $secondary-color: #555;
-$highlight-color: purple;
+$highlight-color: #fa3232;
 $primary-fc: black;
 $secondary-fc: white;
 
@@ -16,6 +16,11 @@ body {
   display: grid;
   grid-template-rows: max-content 1fr max-content;
   height: 100lvh;
+}
+
+main {
+  width: min(70ch, 100% - 4rem);
+  margin-inline: auto;
 }
 
 header {
@@ -47,7 +52,7 @@ footer {
 // Game view
 
 section {
-  margin-top: 2em;
+  margin-top: 1em;
 
   h2 {
     font-size: 1.25rem;
@@ -55,13 +60,38 @@ section {
   }
 }
 
+// Controls
+
+.controls {
+  display: grid;
+  justify-content: center;
+  row-gap: 1em;
+
+  .new-game {
+    width: fit-content;
+    padding: 0.5em 1em;
+    margin: 0 auto;
+    border-radius: 5px;
+    border: none;
+    background-color: $primary-color;
+    color: $secondary-fc;
+    font-weight: bold;
+  }
+
+  .display {
+    min-height: 2.25rem;
+  }
+}
+
+// Boards
+
 .board {
   margin: 0 auto;
   padding: 1em;
   display: grid;
-  grid-template: repeat(11, minmax(30px, 1fr)) / repeat(11, minmax(30px, 1fr));
-  aspect-ratio: 1 / 1;
-  max-height: calc((100svh - 10em) / 2);
+  grid-template: repeat(11, minmax(10px, 1fr)) / repeat(11, minmax(10px, 1fr));
+  aspect-ratio: 1 / 1; // The position isn't right. Fix it later.
+  max-height: calc((100svh - 18em) / 2);
 
   .label {
     display: grid;
@@ -70,9 +100,22 @@ section {
 
   .cell {
     border: 1px solid $secondary-color;
+    display: grid;
+    place-content: center;
 
     &.ship {
       background-color: $primary-color;
+      &.attacked {
+        background-color: $highlight-color;
+      }
+    }
+
+    &.attacked::after {
+      content: "'";
+      width: 0.5em;
+      height: 0.5em;
+      background-color: black;
+      border-radius: 50%;
     }
   }
 }

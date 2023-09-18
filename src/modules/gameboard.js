@@ -36,7 +36,7 @@ class Gameboard {
   }
 
   static getIndexesFromCoordinates(coordinates) {
-    return [coordinates.charCodeAt(0) - 65, +coordinates[1] - 1];
+    return [coordinates.charCodeAt(0) - 65, +coordinates.slice(1) - 1];
   }
 
   getCoordinates(coordinates) {

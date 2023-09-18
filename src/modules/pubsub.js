@@ -19,7 +19,7 @@ const events = (() => {
 
   const emit = (eventName, data) => {
     if (!Object.prototype.hasOwnProperty.call(events, eventName)) return;
-    events[eventName].forEach((fn) => fn[data]);
+    events[eventName].forEach((fn) => fn(data));
   };
 
   return {

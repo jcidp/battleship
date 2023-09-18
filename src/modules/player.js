@@ -9,9 +9,10 @@ class Player {
 
   attack(enemy, coordinates) {
     const shotNumber = this.constructor.getNumberFromCoordinates(coordinates);
-    if (!this.shotsAvailable.includes(shotNumber)) return;
+    if (!this.shotsAvailable.includes(shotNumber)) return false;
     enemy.board.receiveAttack(coordinates);
     this.shotsAvailable = this.shotsAvailable.filter((n) => n !== shotNumber);
+    return true;
   }
 
   static getNumberFromCoordinates(coordinates) {

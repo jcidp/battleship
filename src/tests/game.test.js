@@ -2,8 +2,8 @@ import gameController from "../modules/game";
 
 test("Controller setups game correctly", () => {
   gameController.setupGame();
-  expect(gameController.getPlayer().name).toBe("player1");
-  expect(gameController.getComputer().name).toBe("computer");
+  expect(gameController.getPlayer().name).toBe("You");
+  expect(gameController.getComputer().name).toBe("The enemy");
   //   expect(gameController.getPlayer().board.getCoordinates("J8").ship).toEqual({
   //     hits: 0,
   //     length: 1,

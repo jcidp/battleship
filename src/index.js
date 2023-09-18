@@ -1,8 +1,7 @@
 import "./style.scss";
-import { renderPageLayout, renderInitialScreen } from "./modules/dom";
+import domController from "./modules/dom";
 import gameController from "./modules/game";
 import events from "./modules/pubsub";
 
-renderPageLayout();
+domController.renderPageLayout();
 gameController.setupGame();
-renderInitialScreen();
