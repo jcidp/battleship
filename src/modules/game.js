@@ -83,7 +83,6 @@ const gameController = (() => {
   };
 
   const gameOver = (winner) => {
-    console.log(`${winner.name} won!`);
     activeGame = false;
     events.emit("gameOver", winner);
   };
@@ -126,6 +125,9 @@ const gameController = (() => {
     });
     events.on("restartGame", setupGame);
   };
+
+  events.on("setupGame", setupGame);
+  events.on("renderDummy", createPlayerShips);
 
   return {
     setupGame,

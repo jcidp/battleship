@@ -4,4 +4,3 @@ import gameController from "./modules/game";
 import events from "./modules/pubsub";
 
 domController.renderPageLayout();
-gameController.setupGame();

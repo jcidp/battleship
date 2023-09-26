@@ -1,4 +1,5 @@
 import { createElement, renderLinkIcon } from "./helpers";
+import Player from "./player";
 import events from "./pubsub";
 
 const domController = (() => {
@@ -41,7 +42,7 @@ const domController = (() => {
       row.forEach((cell, j) => {
         let classes = "cell";
         if (cell.attacked) classes += " attacked";
-        if (cell.ship && player === "player") classes += " ship";
+        if (cell.ship && (player === "player" || "dummy")) classes += " ship";
         const coordinates = getCoordinatesFromIndexes(i, j);
         const cellElement = createElement("div", null, classes, [
           ["data-coordinates", coordinates],
@@ -56,23 +57,31 @@ const domController = (() => {
     return boardContainer;
   }
 
-  function renderInitialScreen() {
-    const main = document.querySelector("main");
+  function startGame() {
+    events.emit("setupGame");
+  }
 
+  function renderControls(buttonClass) {
+    const buttonText = buttonClass === "new-game" ? "+ New Game" : "Start Game";
+    const displayText =
+      buttonClass === "new-game"
+        ? "Click on the enemy's board to attack"
+        : "Drag and click on your ships, then click the button above to start the game";
+    const fn = buttonClass === "new-game" ? restartGame : startGame;
     const controlSection = createElement("section", null, "controls");
-    const btn = createElement("button", "+ New Game", "new-game");
-    btn.addEventListener("click", restartGame);
+    const btn = createElement("button", buttonText, buttonClass);
+    btn.addEventListener("click", fn);
     controlSection.appendChild(btn);
     const textDisplay = createElement("div", null, "display");
-    textDisplay.appendChild(
-      createElement(
-        "p",
-        "Click on the enemy's board to attack",
-        "display__text",
-      ),
-    );
+    textDisplay.appendChild(createElement("p", displayText, "display__text"));
     controlSection.appendChild(textDisplay);
-    main.appendChild(controlSection);
+    return controlSection;
+  }
+
+  function renderInitialScreen() {
+    const main = document.querySelector("main");
+    cleanElement(main);
+    main.appendChild(renderControls("new-game"));
 
     const playerSection = createElement("section");
     playerSection.appendChild(createElement("h2", "Your Board"));
@@ -106,6 +115,18 @@ const domController = (() => {
     updateScreen();
   }
 
+  function renderRandomBoard() {
+    const playerSection = document.querySelector("section.player.setup");
+    cleanElement(playerSection);
+    const dummyPlayer = new Player("dummy");
+    events.emit("renderDummy", dummyPlayer);
+    playerSection.appendChild(createElement("h2", "Your Board"));
+    playerSection.appendChild(renderBoard(dummyPlayer.getBoard(), "dummy"));
+    const randomizeBtn = createElement("button", "Randomize", "randomize");
+    randomizeBtn.addEventListener("click", renderRandomBoard);
+    playerSection.appendChild(randomizeBtn);
+  }
+
   function renderPageLayout() {
     const body = document.querySelector("body");
 
@@ -113,7 +134,14 @@ const domController = (() => {
     header.appendChild(createElement("h1", "Battleship"));
     body.appendChild(header);
 
-    body.appendChild(createElement("main"));
+    const main = createElement("main");
+    main.appendChild(renderControls("start-game"));
+
+    const playerSection = createElement("section", null, "player setup");
+
+    main.appendChild(playerSection);
+
+    body.appendChild(main);
 
     const footer = createElement("footer");
     const a = createElement("a", "", "", [
@@ -131,6 +159,7 @@ const domController = (() => {
     footer.appendChild(a);
     body.appendChild(footer);
 
+    renderRandomBoard();
     events.on("gameStarted", setupBoards);
     events.on("gameStarted", renderInitialScreen);
     events.on("turnEnd", updateScreen);

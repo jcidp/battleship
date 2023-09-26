@@ -60,6 +60,19 @@ section {
   }
 }
 
+button {
+  width: fit-content;
+  padding: 0.5em 1em;
+  margin: 0 auto;
+  border-radius: 5px;
+  border: none;
+  font-weight: bold;
+  
+  &:hover {
+    cursor: pointer;
+  }
+}
+
 // Controls
 
 .controls {
@@ -67,15 +80,9 @@ section {
   justify-content: center;
   row-gap: 1em;
 
-  .new-game {
-    width: fit-content;
-    padding: 0.5em 1em;
-    margin: 0 auto;
-    border-radius: 5px;
-    border: none;
+  button {
     background-color: $primary-color;
     color: $secondary-fc;
-    font-weight: bold;
   }
 
   .display {
@@ -117,5 +124,20 @@ section {
       background-color: black;
       border-radius: 50%;
     }
+  }
+}
+
+.player.setup {
+  display: grid;
+  justify-content: center;
+
+  .dummy.board {
+    padding-bottom: 0;
+    max-height: calc((100svh - 18em));
+  }
+
+  .randomize {
+    background-color: transparent;
+    //border: 1px solid $primary-color;
   }
 }
