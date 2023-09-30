@@ -133,7 +133,8 @@ const domController = (() => {
   }
 
   function startGame() {
-    events.emit("setupGame");
+    events.emit("startGame");
+    renderGameScreen();
   }
 
   function renderControls(buttonClass) {
@@ -153,7 +154,7 @@ const domController = (() => {
     return controlSection;
   }
 
-  function renderInitialScreen() {
+  function renderGameScreen() {
     const main = document.querySelector("main");
     cleanElement(main);
     main.appendChild(renderControls("new-game"));
@@ -167,8 +168,6 @@ const domController = (() => {
     enemySection.appendChild(createElement("h2", "Enemy's Board"));
     enemySection.appendChild(renderBoard(boards.computer, "computer"));
     main.appendChild(enemySection);
-
-    events.on("gameOver", showGameOver);
   }
 
   function cleanElement(parent) {
@@ -182,23 +181,30 @@ const domController = (() => {
   function updateScreen() {
     const main = document.querySelector("main");
     cleanElement(main);
-    renderInitialScreen();
+    renderGameScreen();
   }
 
   function restartGame() {
     events.emit("restartGame");
-    updateScreen();
+    const body = document.querySelector("body");
+    cleanElement(body);
+    renderPageLayout();
   }
 
-  function renderRandomBoard() {
+  function randomizePlayerBoard() {
+    events.emit("RandomizePlayerBoard");
+    const container = document.querySelector("section.player.setup");
+    cleanElement(container);
+    renderSetupBoard();
+  }
+
+  function renderSetupBoard() {
     const playerSection = document.querySelector("section.player.setup");
     cleanElement(playerSection);
-    const dummyPlayer = new Player("dummy");
-    events.emit("renderDummy", dummyPlayer);
     playerSection.appendChild(createElement("h2", "Your Board"));
-    playerSection.appendChild(renderBoard(dummyPlayer.getBoard(), "dummy"));
+    playerSection.appendChild(renderBoard(boards.player, "dummy"));
     const randomizeBtn = createElement("button", "Randomize", "randomize");
-    randomizeBtn.addEventListener("click", renderRandomBoard);
+    randomizeBtn.addEventListener("click", randomizePlayerBoard);
     playerSection.appendChild(randomizeBtn);
   }
 
@@ -234,15 +240,16 @@ const domController = (() => {
     footer.appendChild(a);
     body.appendChild(footer);
 
-    renderRandomBoard();
-    events.on("gameStarted", setupBoards);
-    events.on("gameStarted", renderInitialScreen);
-    events.on("turnEnd", updateScreen);
+    renderSetupBoard();
   }
+
+  events.on("gameSetup", setupBoards);
+  events.on("turnEnd", updateScreen);
+  events.on("gameOver", showGameOver);
 
   return {
     renderPageLayout,
-    renderInitialScreen,
+    renderGameScreen,
     updateScreen,
   };
 })();

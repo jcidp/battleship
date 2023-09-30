@@ -18,6 +18,7 @@ test("Controller setups game correctly", () => {
 
 test("Player can play a turn", () => {
   gameController.setupGame();
+  gameController.startGame();
   expect(gameController.getComputer().board.getCoordinates("C4").attacked).toBe(
     false,
   );

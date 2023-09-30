@@ -18,6 +18,28 @@ class Gameboard {
     return board;
   }
 
+  fillBoardWithShips() {
+    this.placeShipRandomly(5);
+    this.placeShipRandomly(4);
+    this.placeShipRandomly(3);
+    this.placeShipRandomly(3);
+    this.placeShipRandomly(2);
+  }
+
+  resetBoard() {
+    this.cleanBoard();
+    this.fillBoardWithShips();
+  }
+
+  cleanBoard() {
+    this.board.forEach((row) => {
+      row.forEach((cell) => {
+        cell.attacked = false;
+        cell.ship = null;
+      });
+    });
+  }
+
   placeShip(start, end) {
     const [startCol, startRow] =
       this.constructor.getIndexesFromCoordinates(start);

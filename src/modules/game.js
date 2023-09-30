@@ -9,14 +9,6 @@ const gameController = (() => {
   const getPlayer = () => player;
   const getComputer = () => computer;
 
-  const createPlayerShips = (player) => {
-    player.board.placeShipRandomly(5);
-    player.board.placeShipRandomly(4);
-    player.board.placeShipRandomly(3);
-    player.board.placeShipRandomly(3);
-    player.board.placeShipRandomly(2);
-  };
-
   const gameOver = (winner) => {
     activeGame = false;
     events.emit("gameOver", winner);
@@ -47,25 +39,35 @@ const gameController = (() => {
 
   const setupGame = () => {
     player = new Player("You");
+    player.board.fillBoardWithShips();
     computer = new Player("The enemy");
-    activeGame = true;
-
-    createPlayerShips(player);
-    createPlayerShips(computer);
-
-    events.on("playerAttack", playTurn);
-    events.emit("gameStarted", {
+    computer.board.fillBoardWithShips();
+    events.emit("gameSetup", {
       player: getPlayer().getBoard(),
       computer: getComputer().getBoard(),
     });
-    events.on("restartGame", setupGame);
+    events.on(
+      "RandomizePlayerBoard",
+      player.board.resetBoard.bind(player.board),
+    );
   };
 
-  events.on("setupGame", setupGame);
-  events.on("renderDummy", createPlayerShips);
+  const startGame = () => {
+    activeGame = true;
+  };
+
+  const restartGame = () => {
+    player.board.resetBoard();
+    computer.board.resetBoard();
+  };
+
+  events.on("startGame", startGame);
+  events.on("playerAttack", playTurn);
+  events.on("restartGame", restartGame);
 
   return {
     setupGame,
+    startGame,
     getPlayer,
     getComputer,
     playTurn,
