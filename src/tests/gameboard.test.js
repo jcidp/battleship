@@ -90,3 +90,34 @@ test("haveAllShipsSunk() returns true if they for 2 sunk ships of length 2 & 3",
   board.receiveAttack("G10");
   expect(board.haveAllShipsSunk()).toBe(true);
 });
+
+test("Board can move ship", () => {
+  const board = new Gameboard();
+  board.placeShip("A1", "A3");
+  board.moveShip("A1", "J8");
+  expect(board.getCoordinates("A1").ship).toBeNull();
+  expect(board.getCoordinates("A2").ship).toBeNull();
+  expect(board.getCoordinates("A3").ship).toBeNull();
+  expect(board.getCoordinates("J8").ship.length).toBe(3);
+  expect(board.getCoordinates("J9").ship.length).toBe(3);
+  expect(board.getCoordinates("J10").ship.length).toBe(3);
+});
+
+test("Board can't move ship to occupied space", () => {
+  const board = new Gameboard();
+  board.placeShip("A10", "D10");
+  board.placeShip("F3", "F7");
+  expect(() => board.moveShip("A10", "D6")).toThrow(
+    "Target position is occupied",
+  );
+});
+
+test("Board can move ship to a position occupied by itself", () => {
+  const board = new Gameboard();
+  board.placeShip("C2", "C4");
+  board.moveShip("C2", "C3");
+  expect(board.getCoordinates("C2").ship).toBeNull();
+  expect(board.getCoordinates("C3").ship.length).toBe(3);
+  expect(board.getCoordinates("C4").ship.length).toBe(3);
+  expect(board.getCoordinates("C5").ship.length).toBe(3);
+});

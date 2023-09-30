@@ -35,8 +35,142 @@ class Gameboard {
     }
   }
 
+  static forEachPositionCell(startCoordinates, ship, fn) {
+    const [startCol, startRow] =
+      this.getIndexesFromCoordinates(startCoordinates);
+    const result = [];
+    for (let i = 0; i < ship.length; i++) {
+      if (ship.direction === "h") result.push(fn(startRow, startCol + i));
+      else result.push(fn(startRow + i, startCol));
+    }
+    return result;
+  }
+
+  moveShip(sourceCoordinates, targetCoordinates) {
+    const { ship } = this.getCoordinates(sourceCoordinates);
+    const newCoordinates = this.constructor.forEachPositionCell(
+      targetCoordinates,
+      ship,
+      (row, col) => this.isCoordinateFree(row, col, ship),
+    );
+    if (!newCoordinates.every((cell) => cell))
+      throw new Error("Target position is occupied");
+    this.constructor.forEachPositionCell(
+      sourceCoordinates,
+      ship,
+      (row, col) => {
+        this.board[row][col].ship = null;
+      },
+    );
+    this.constructor.forEachPositionCell(
+      targetCoordinates,
+      ship,
+      (row, col) => {
+        this.board[row][col].ship = ship;
+      },
+    );
+  }
+
+  isCoordinateFree(row, col, ship) {
+    if (
+      this.board[row][col].ship &&
+      (!ship || this.board[row][col].ship !== ship)
+    )
+      return false;
+    if (
+      row > 0 &&
+      this.board[row - 1][col].ship &&
+      (!ship || this.board[row - 1][col].ship !== ship)
+    )
+      return false;
+    if (
+      col < 9 &&
+      this.board[row][col + 1].ship &&
+      (!ship || this.board[row][col + 1].ship !== ship)
+    )
+      return false;
+    if (
+      row < 9 &&
+      this.board[row + 1][col].ship &&
+      (!ship || this.board[row + 1][col].ship !== ship)
+    )
+      return false;
+    if (
+      col > 0 &&
+      this.board[row][col - 1].ship &&
+      (!ship || this.board[row][col - 1].ship !== ship)
+    )
+      return false;
+    return true;
+  }
+
+  isPositionValid(start, end) {
+    const [startCol, startRow] =
+      this.constructor.getIndexesFromCoordinates(start);
+    const [endCol, endRow] = this.constructor.getIndexesFromCoordinates(end);
+    const distance =
+      startRow === endRow ? endCol - startCol + 1 : endRow - startRow + 1;
+    for (let i = 0; i < distance; i++) {
+      if (startRow === endRow) {
+        if (!this.isCoordinateFree(startRow, startCol + i)) return false;
+      } else if (!this.isCoordinateFree(startRow + i, startCol)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  placeShipRandomly(length) {
+    let initialPosition;
+    let finalPosition;
+    let validPosition = false;
+    while (!validPosition) {
+      initialPosition = this.constructor.getCoordinatesFromNumber(
+        Math.floor(Math.random() * 100) + 1,
+      );
+      const direction = Math.random() < 0.5 ? "horizontal" : "vertical";
+      if (direction === "horizontal") {
+        finalPosition =
+          String.fromCharCode(
+            initialPosition.charCodeAt(0) + length - 1 <= 74
+              ? initialPosition.charCodeAt(0) + length - 1
+              : initialPosition.charCodeAt(0) - length + 1,
+          ) + initialPosition.slice(1);
+      } else {
+        const initialNumber = +initialPosition.slice(1);
+        finalPosition =
+          initialPosition[0] +
+          (initialNumber + length - 1 <= 10
+            ? initialNumber + length - 1
+            : initialNumber - length + 1);
+      }
+      if (
+        initialPosition.charCodeAt(0) > finalPosition.charCodeAt(0) ||
+        +initialPosition.slice(1) > +finalPosition.slice(1)
+      ) {
+        [initialPosition, finalPosition] = [finalPosition, initialPosition];
+      }
+      validPosition = this.isPositionValid(initialPosition, finalPosition);
+    }
+    this.placeShip(initialPosition, finalPosition);
+  }
+
   static getIndexesFromCoordinates(coordinates) {
-    return [coordinates.charCodeAt(0) - 65, +coordinates.slice(1) - 1];
+    const colIndex = coordinates.charCodeAt(0) - 65;
+    const rowIndex = +coordinates.slice(1) - 1;
+    if (colIndex < 0 || colIndex > 9 || rowIndex < 0 || rowIndex > 9)
+      throw new Error("Invalid Coordinates");
+    return [colIndex, rowIndex];
+  }
+
+  static getNumberFromCoordinates(coordinates) {
+    return coordinates.charCodeAt(0) - 64 + +coordinates.slice(1) * 10 - 10;
+  }
+
+  static getCoordinatesFromNumber(n) {
+    return `${String.fromCharCode((n % 10 === 0 ? 10 : n % 10) + 64)}${
+      Math.floor(n / 10) + (n % 10 === 0 ? 0 : 1)
+    }`;
   }
 
   getCoordinates(coordinates) {
