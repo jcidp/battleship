@@ -22,13 +22,13 @@ class Gameboard {
     const [startCol, startRow] =
       this.constructor.getIndexesFromCoordinates(start);
     if (!end) {
-      this.board[startRow][startCol].ship = new Ship(1);
+      this.board[startRow][startCol].ship = new Ship(1, start, "h");
       return;
     }
     const [endCol, endRow] = this.constructor.getIndexesFromCoordinates(end);
     const distance =
       startRow === endRow ? endCol - startCol + 1 : endRow - startRow + 1;
-    const ship = new Ship(distance);
+    const ship = new Ship(distance, start, startRow === endRow ? "h" : "v");
     for (let i = 0; i < distance; i++) {
       if (startRow === endRow) this.board[startRow][startCol + i].ship = ship;
       else this.board[startRow + i][startCol].ship = ship;

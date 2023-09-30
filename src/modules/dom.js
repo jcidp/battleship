@@ -23,7 +23,63 @@ const domController = (() => {
   }
 
   function attackCell(e) {
-    events.emit("playerAttack", e.target.dataset.coordinates);
+    events.emit("playerAttack", e.target.id);
+  }
+
+  function getCoordinatesOffset(coordinates, offset, direction) {
+    if (direction === "h") {
+      return (
+        String.fromCharCode(coordinates.charCodeAt(0) - offset) +
+        coordinates.slice(1)
+      );
+    }
+    return coordinates[0] + (+coordinates.slice(1) - offset);
+  }
+
+  // Drag & drop handlers
+  function drag(e) {
+    //e.preventDefault();
+    e.dataTransfer.setData("text/coordinates", e.target.closest(".cell").id);
+    const lengthX =
+      e.target.dataset.direction === "h"
+        ? e.target.offsetWidth / +e.target.dataset.length
+        : e.target.offsetWidth;
+    const lengthY =
+      e.target.dataset.direction === "v"
+        ? e.target.offsetHeight / +e.target.dataset.length
+        : e.target.offsetHeight;
+    const squareOffset =
+      e.target.dataset.direction === "h"
+        ? Math.floor(e.offsetX / lengthX)
+        : Math.floor(e.offsetY / lengthY);
+    console.log(squareOffset);
+    e.dataTransfer.setData("text/offset", squareOffset);
+    e.dataTransfer.effectAllowed = "move";
+  }
+
+  function allowDrop(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    if (e.target.classList.contains("ship")) e.dataTransfer.dropEffect = "none";
+  }
+
+  function drop(e) {
+    e.preventDefault();
+    const sourceCoordinates = e.dataTransfer.getData("text/coordinates");
+    const offSet = e.dataTransfer.getData("text/offset");
+    const sourceCell = document.getElementById(sourceCoordinates);
+    const { direction } = sourceCell.firstElementChild.dataset;
+    console.log(sourceCoordinates);
+    const targetCoordinates = getCoordinatesOffset(
+      e.target.id,
+      offSet,
+      direction,
+    );
+    console.log(targetCoordinates);
+    const newParent = document.getElementById(targetCoordinates);
+    newParent.appendChild(sourceCell.firstElementChild);
+    // Add event that moves the ship in the underlying board,
+    // and maybe change the move from the drag to a re-render
   }
 
   function renderBoard(board, player) {
@@ -42,16 +98,35 @@ const domController = (() => {
       row.forEach((cell, j) => {
         let classes = "cell";
         if (cell.attacked) classes += " attacked";
-        if (cell.ship && (player === "player" || "dummy")) classes += " ship";
+        if (cell.ship && player === "player") classes += " ship";
         const coordinates = getCoordinatesFromIndexes(i, j);
         const cellElement = createElement("div", null, classes, [
-          ["data-coordinates", coordinates],
+          ["id", coordinates],
         ]);
         if (player === "computer") {
           cellElement.addEventListener("click", attackCell);
           if (cell.attacked && cell.ship) cellElement.classList.add("ship");
         }
+        if (player === "dummy") {
+          cellElement.addEventListener("dragover", allowDrop);
+          cellElement.addEventListener("drop", drop);
+        }
         boardContainer.appendChild(cellElement);
+        if (player === "dummy" && cell.ship) {
+          if (cell.ship.startCoordinates === coordinates) {
+            const ship = createElement("div", null, "drag-ship", [
+              ["draggable", true],
+              ["data-length", cell.ship.length],
+              ["data-direction", cell.ship.direction],
+            ]);
+            ship.addEventListener("dragstart", drag);
+            if (cell.ship.direction === "h")
+              ship.style.width =
+                cell.ship.length === 5 ? "560%" : `${cell.ship.length * 111}%`;
+            else ship.style.height = `${cell.ship.length * 11}0%`;
+            cellElement.appendChild(ship);
+          }
+        }
       });
     });
     return boardContainer;
