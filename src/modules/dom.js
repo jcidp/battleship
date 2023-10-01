@@ -26,6 +26,20 @@ const domController = (() => {
     events.emit("playerAttack", e.target.id);
   }
 
+  function rotateShip(e) {
+    try {
+      events.emit("moveShip", [e.target.closest(".cell").id]);
+      renderSetupBoard();
+      display("Drag your ships to move them. Click them to rotate them.");
+    } catch (error) {
+      if (error.message === "Target position is occupied")
+        display("Not enough space to rotate that ship. Ships can't touch.");
+      else if (error.message === "Invalid Coordinates")
+        display("There's not enough space to rotate your ship");
+      else console.log(error);
+    }
+  }
+
   function getCoordinatesOffset(coordinates, offset, direction) {
     if (direction === "h") {
       return (
@@ -52,7 +66,6 @@ const domController = (() => {
       e.target.dataset.direction === "h"
         ? Math.floor(e.offsetX / lengthX)
         : Math.floor(e.offsetY / lengthY);
-    console.log(squareOffset);
     e.dataTransfer.setData("text/offset", squareOffset);
     e.dataTransfer.effectAllowed = "move";
   }
@@ -71,19 +84,20 @@ const domController = (() => {
       const offSet = e.dataTransfer.getData("text/offset");
       const sourceCell = document.getElementById(sourceCoordinates);
       const { direction } = sourceCell.firstElementChild.dataset;
-      console.log(sourceCoordinates);
       const targetCoordinates = getCoordinatesOffset(
         e.target.id,
         offSet,
         direction,
       );
-      console.log(targetCoordinates);
       events.emit("moveShip", [sourceCoordinates, targetCoordinates]);
       renderSetupBoard();
       display("Drag your ships to move them. Click them to rotate them.");
     } catch (error) {
       if (error.message === "Target position is occupied")
-        display(error.message);
+        display("Not enough space there for your ship. Ships can't touch.");
+      else if (error.message === "Invalid Coordinates")
+        display("The position you're trying to move your ship to is invalid.");
+      else console.log(error);
     }
   }
 
@@ -129,6 +143,7 @@ const domController = (() => {
               ["data-length", cell.ship.length],
               ["data-direction", cell.ship.direction],
             ]);
+            ship.addEventListener("click", rotateShip);
             ship.addEventListener("dragstart", drag);
             ship.addEventListener("dragend", dragend);
             if (cell.ship.direction === "h")

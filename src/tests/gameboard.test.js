@@ -135,3 +135,17 @@ test("Board gets cleaned properly", () => {
   expect(board.getCoordinates("F8").ship).toBeNull();
   expect(board.getCoordinates("G8").ship).toBeNull();
 });
+
+test("Board can rotate ships", () => {
+  const board = new Gameboard();
+  board.placeShip("A1", "A4");
+  expect(board.getCoordinates("A1").ship.direction).toBe("v");
+  board.moveShip("A1");
+  expect(board.getCoordinates("A1").ship.direction).toBe("h");
+  expect(board.getCoordinates("A2").ship).toBeNull();
+  expect(board.getCoordinates("A3").ship).toBeNull();
+  expect(board.getCoordinates("A4").ship).toBeNull();
+  expect(board.getCoordinates("B1").ship.length).toBe(4);
+  expect(board.getCoordinates("C1").ship.length).toBe(4);
+  expect(board.getCoordinates("D1").ship.length).toBe(4);
+});

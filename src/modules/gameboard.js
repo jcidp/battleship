@@ -57,12 +57,12 @@ class Gameboard {
     }
   }
 
-  static forEachPositionCell(startCoordinates, ship, fn) {
+  static forEachPositionCell(startCoordinates, direction, length, fn) {
     const [startCol, startRow] =
       this.getIndexesFromCoordinates(startCoordinates);
     const result = [];
-    for (let i = 0; i < ship.length; i++) {
-      if (ship.direction === "h") result.push(fn(startRow, startCol + i));
+    for (let i = 0; i < length; i++) {
+      if (direction === "h") result.push(fn(startRow, startCol + i));
       else result.push(fn(startRow + i, startCol));
     }
     return result;
@@ -70,31 +70,50 @@ class Gameboard {
 
   moveShip(sourceCoordinates, targetCoordinates) {
     const { ship } = this.getCoordinates(sourceCoordinates);
+    const direction = targetCoordinates ? ship.direction : null;
     const newCoordinates = this.constructor.forEachPositionCell(
-      targetCoordinates,
-      ship,
+      targetCoordinates || sourceCoordinates,
+      direction || (ship.direction === "h" ? "v" : "h"),
+      ship.length,
       (row, col) => this.isCoordinateFree(row, col, ship),
     );
     if (!newCoordinates.every((cell) => cell))
       throw new Error("Target position is occupied");
     this.constructor.forEachPositionCell(
       sourceCoordinates,
-      ship,
+      ship.direction,
+      ship.length,
       (row, col) => {
         this.board[row][col].ship = null;
       },
     );
-    ship.startCoordinates = targetCoordinates;
+    if (targetCoordinates) ship.startCoordinates = targetCoordinates;
+    else ship.direction = ship.direction === "h" ? "v" : "h";
     this.constructor.forEachPositionCell(
-      targetCoordinates,
-      ship,
+      targetCoordinates || sourceCoordinates,
+      ship.direction,
+      ship.length,
       (row, col) => {
         this.board[row][col].ship = ship;
       },
     );
   }
 
+  rotateShip(sourceCoordinates) {
+    const { ship } = this.getCoordinates(sourceCoordinates);
+    const newCoordinates = this.constructor.forEachPositionCell(
+      sourceCoordinates,
+      ship.direction === "h" ? "v" : "h",
+      ship.length,
+      (row, col) => this.isCoordinateFree(row, col, ship),
+    );
+    if (!newCoordinates.every((cell) => cell))
+      throw new Error("Target position is occupied");
+  }
+
   isCoordinateFree(row, col, ship) {
+    if (col < 0 || col > 9 || row < 0 || row > 9)
+      throw new Error("Invalid Coordinates");
     if (
       this.board[row][col].ship &&
       (!ship || this.board[row][col].ship !== ship)
