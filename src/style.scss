@@ -15,7 +15,7 @@ $secondary-fc: white;
 body {
   display: grid;
   grid-template-rows: max-content 1fr max-content;
-  height: 100dvh;  // Test other behaviors
+  height: 100svh;
 }
 
 main {
@@ -97,8 +97,9 @@ button {
   padding: 1em;
   display: grid;
   grid-template: repeat(11, minmax(10px, 1fr)) / repeat(11, minmax(10px, 1fr));
-  aspect-ratio: 1 / 1; // The position isn't right. Fix it later.
-  max-height: calc((100svh - 18em) / 2);
+  aspect-ratio: 1 / 1;
+  max-height: calc((100svh - 17em) / 2);
+  transform: translateX(-3%);
 
   .label {
     display: grid;
@@ -118,12 +119,19 @@ button {
       }
     }
   
-    &.attacked::after {
+    &.attacked:not(.ship)::after {
       content: "'";
       width: 0.5em;
       height: 0.5em;
       background-color: black;
       border-radius: 50%;
+    }
+
+    &.attacked.ship::after {
+      content: "";
+      width: 1em;
+      height: 1em;
+      background: url(explosion.png) no-repeat center/contain;
     }
 
     .drag-ship {
@@ -143,16 +151,33 @@ button {
 }
 
 .player.setup {
-  display: grid;
-  justify-content: center;
-
   .dummy.board {
     padding-bottom: 0;
-    max-height: calc((100svh - 18em));
+  }
+
+  .btn-container {
+    display: flex;
+    justify-content: center;
   }
 
   .randomize {
     background-color: transparent;
     //border: 1px solid $primary-color;
+  }
+}
+
+@media (min-width: 800px) {
+  main {
+    display: grid;
+    grid-template: repeat(2, max-content) / repeat(2, 1fr);
+    width: min(1200px, 100% - 4rem);
+
+    section:first-of-type, section.player.setup {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .board {
+    max-height: calc(100svh - 18em);
   }
 }

@@ -1,5 +1,4 @@
 import { createElement, renderLinkIcon } from "./helpers";
-import Player from "./player";
 import events from "./pubsub";
 
 const domController = (() => {
@@ -147,9 +146,13 @@ const domController = (() => {
             ship.addEventListener("dragstart", drag);
             ship.addEventListener("dragend", dragend);
             if (cell.ship.direction === "h")
-              ship.style.width =
-                cell.ship.length === 5 ? "560%" : `${cell.ship.length * 111}%`;
-            else ship.style.height = `${cell.ship.length * 11}0%`;
+              ship.style.width = `calc(${cell.ship.length * 100}% + ${
+                cell.ship.length * 2 - 2
+              }px`;
+            else
+              ship.style.height = `calc(${cell.ship.length * 100}% + ${
+                cell.ship.length * 2 - 2
+              }px`;
             cellElement.appendChild(ship);
           }
         }
@@ -229,7 +232,9 @@ const domController = (() => {
     playerSection.appendChild(renderBoard(boards.player, "dummy"));
     const randomizeBtn = createElement("button", "Randomize", "randomize");
     randomizeBtn.addEventListener("click", randomizePlayerBoard);
-    playerSection.appendChild(randomizeBtn);
+    const btnContainer = createElement("div", null, "btn-container");
+    btnContainer.appendChild(randomizeBtn);
+    playerSection.appendChild(btnContainer);
   }
 
   function renderPageLayout() {
