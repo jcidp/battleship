@@ -121,3 +121,17 @@ test("Board can move ship to a position occupied by itself", () => {
   expect(board.getCoordinates("C4").ship.length).toBe(3);
   expect(board.getCoordinates("C5").ship.length).toBe(3);
 });
+
+test("Board gets cleaned properly", () => {
+  const board = new Gameboard();
+  board.placeShip("D8", "G8");
+  board.receiveAttack("E8");
+  board.receiveAttack("B2");
+  board.cleanBoard();
+  expect(board.getCoordinates("E8").attacked).toBe(false);
+  expect(board.getCoordinates("B2").attacked).toBe(false);
+  expect(board.getCoordinates("D8").ship).toBeNull();
+  expect(board.getCoordinates("E8").ship).toBeNull();
+  expect(board.getCoordinates("F8").ship).toBeNull();
+  expect(board.getCoordinates("G8").ship).toBeNull();
+});

@@ -42,7 +42,7 @@ const gameController = (() => {
     player.board.fillBoardWithShips();
     computer = new Player("The enemy");
     computer.board.fillBoardWithShips();
-    events.emit("gameSetup", {
+    events.emit("setupBoards", {
       player: getPlayer().getBoard(),
       computer: getComputer().getBoard(),
     });
@@ -59,9 +59,16 @@ const gameController = (() => {
   const restartGame = () => {
     player.board.resetBoard();
     computer.board.resetBoard();
+    player.resetShotsAvailable();
+    computer.resetShotsAvailable();
+  };
+
+  const moveShip = (coordinates) => {
+    player.board.moveShip(coordinates[0], coordinates[1]);
   };
 
   events.on("startGame", startGame);
+  events.on("moveShip", moveShip);
   events.on("playerAttack", playTurn);
   events.on("restartGame", restartGame);
 

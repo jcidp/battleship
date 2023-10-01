@@ -84,6 +84,7 @@ class Gameboard {
         this.board[row][col].ship = null;
       },
     );
+    ship.startCoordinates = targetCoordinates;
     this.constructor.forEachPositionCell(
       targetCoordinates,
       ship,

@@ -60,26 +60,36 @@ const domController = (() => {
   function allowDrop(e) {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
-    if (e.target.classList.contains("ship")) e.dataTransfer.dropEffect = "none";
+    // if (something) e.dataTransfer.dropEffect = "none";
+    if (e.target.classList.contains("drag-ship")) e.target.style.zIndex = -1;
   }
 
   function drop(e) {
     e.preventDefault();
-    const sourceCoordinates = e.dataTransfer.getData("text/coordinates");
-    const offSet = e.dataTransfer.getData("text/offset");
-    const sourceCell = document.getElementById(sourceCoordinates);
-    const { direction } = sourceCell.firstElementChild.dataset;
-    console.log(sourceCoordinates);
-    const targetCoordinates = getCoordinatesOffset(
-      e.target.id,
-      offSet,
-      direction,
-    );
-    console.log(targetCoordinates);
-    const newParent = document.getElementById(targetCoordinates);
-    newParent.appendChild(sourceCell.firstElementChild);
-    // Add event that moves the ship in the underlying board,
-    // and maybe change the move from the drag to a re-render
+    try {
+      const sourceCoordinates = e.dataTransfer.getData("text/coordinates");
+      const offSet = e.dataTransfer.getData("text/offset");
+      const sourceCell = document.getElementById(sourceCoordinates);
+      const { direction } = sourceCell.firstElementChild.dataset;
+      console.log(sourceCoordinates);
+      const targetCoordinates = getCoordinatesOffset(
+        e.target.id,
+        offSet,
+        direction,
+      );
+      console.log(targetCoordinates);
+      events.emit("moveShip", [sourceCoordinates, targetCoordinates]);
+      renderSetupBoard();
+      display("Drag your ships to move them. Click them to rotate them.");
+    } catch (error) {
+      if (error.message === "Target position is occupied")
+        display(error.message);
+    }
+  }
+
+  function dragend(e) {
+    const ships = document.querySelectorAll(".drag-ship");
+    ships.forEach((ship) => (ship.style.zIndex = 1));
   }
 
   function renderBoard(board, player) {
@@ -120,6 +130,7 @@ const domController = (() => {
               ["data-direction", cell.ship.direction],
             ]);
             ship.addEventListener("dragstart", drag);
+            ship.addEventListener("dragend", dragend);
             if (cell.ship.direction === "h")
               ship.style.width =
                 cell.ship.length === 5 ? "560%" : `${cell.ship.length * 111}%`;
@@ -142,7 +153,7 @@ const domController = (() => {
     const displayText =
       buttonClass === "new-game"
         ? "Click on the enemy's board to attack"
-        : "Drag and click on your ships, then click the button above to start the game";
+        : "Drag your ships to move them. Click them to rotate them.";
     const fn = buttonClass === "new-game" ? restartGame : startGame;
     const controlSection = createElement("section", null, "controls");
     const btn = createElement("button", buttonText, buttonClass);
@@ -193,8 +204,6 @@ const domController = (() => {
 
   function randomizePlayerBoard() {
     events.emit("RandomizePlayerBoard");
-    const container = document.querySelector("section.player.setup");
-    cleanElement(container);
     renderSetupBoard();
   }
 
@@ -243,7 +252,7 @@ const domController = (() => {
     renderSetupBoard();
   }
 
-  events.on("gameSetup", setupBoards);
+  events.on("setupBoards", setupBoards);
   events.on("turnEnd", updateScreen);
   events.on("gameOver", showGameOver);
 

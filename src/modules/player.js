@@ -7,6 +7,10 @@ class Player {
     this.shotsAvailable = Array.from(Array(100).fill(), (_, i) => i + 1);
   }
 
+  resetShotsAvailable() {
+    this.shotsAvailable = Array.from(Array(100).fill(), (_, i) => i + 1);
+  }
+
   attack(enemy, coordinates) {
     const shotNumber =
       this.board.constructor.getNumberFromCoordinates(coordinates);
