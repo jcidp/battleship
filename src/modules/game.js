@@ -78,6 +78,7 @@ const gameController = (() => {
     getPlayer,
     getComputer,
     playTurn,
+    gameOver,
   };
 })();
 

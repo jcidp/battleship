@@ -8,10 +8,13 @@ const events = (() => {
   };
 
   const off = (eventName, fn) => {
+    console.log(events[eventName]);
     if (!Object.prototype.hasOwnProperty.call(events, eventName)) return;
     for (let i = 0; i < events[eventName].length; i++) {
       if (events[eventName][i] === fn) {
+        console.log(events[eventName]);
         events[eventName].splice(i, 1);
+        console.log(events[eventName]);
         break;
       }
     }
@@ -22,10 +25,13 @@ const events = (() => {
     events[eventName].forEach((fn) => fn(data));
   };
 
+  const getEvents = () => events;
+
   return {
     on,
     off,
     emit,
+    getEvents,
   };
 })();
 
